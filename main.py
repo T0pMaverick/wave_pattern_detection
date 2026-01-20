@@ -133,18 +133,27 @@ def label_stage_substage(df):
 # Safe fetch
 # =========================================================
 
-def safe_get_hist(symbol):
-    for _ in range(3):
+import time
+
+def safe_get_hist(symbol, retries=10, delay=5):
+    for attempt in range(1, retries + 1):
         try:
-            return tv.get_hist(
+            print(f"[tvDatafeed] Attempt {attempt} for {symbol}")
+            df = tv.get_hist(
                 symbol=symbol,
                 exchange="CSELK",
                 interval=Interval.in_daily,
                 n_bars=400
             )
-        except:
-            time.sleep(2)
+            if df is not None and len(df) > 0:
+                return df
+        except Exception as e:
+            print(f"[tvDatafeed] Failed attempt {attempt}: {e}")
+            time.sleep(delay)
+
     return None
+
+
 
 # =========================================================
 # API (FINAL, CYCLE-AWARE)
@@ -219,17 +228,23 @@ def get_stage(symbol: str):
 
     cur = current_block.iloc[-1]
     
-    ohlcv = [
-            {
-                "date": idx.strftime("%Y-%m-%d"),
-                "open": float(df.loc[idx, "open"]),
-                "high": float(df.loc[idx, "high"]),
-                "low": float(df.loc[idx, "low"]),
-                "close": float(df.loc[idx, "close"]),
-                "volume": float(df.loc[idx, "volume"])
-            }
-            for idx in df.index
-        ]
+    ohlcv = []
+
+    for idx in sorted(df.index):
+        row = df.loc[idx]
+
+        # skip invalid rows
+        if pd.isna(row.open) or pd.isna(row.high) or pd.isna(row.low) or pd.isna(row.close):
+            continue
+
+        ohlcv.append({
+            "date": idx.strftime("%Y-%m-%d"),
+            "open": float(row.open),
+            "high": float(row.high),
+            "low": float(row.low),
+            "close": float(row.close),
+            "volume": float(row.volume)
+        })
 
 
     return {
