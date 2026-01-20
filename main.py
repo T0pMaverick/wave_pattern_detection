@@ -203,8 +203,22 @@ def get_stage(symbol: str):
                 last_sub_block = sub_blocks[-2]
 
     cur = current_block.iloc[-1]
+    
+    ohlcv = [
+            {
+                "date": idx.strftime("%Y-%m-%d"),
+                "open": float(df.loc[idx, "open"]),
+                "high": float(df.loc[idx, "high"]),
+                "low": float(df.loc[idx, "low"]),
+                "close": float(df.loc[idx, "close"]),
+                "volume": float(df.loc[idx, "volume"])
+            }
+            for idx in df.index
+        ]
+
 
     return {
+        
         "symbol": symbol,
 
         "current_stage": current_stage,
@@ -230,5 +244,6 @@ def get_stage(symbol: str):
 
         "last_stage": expected_prev,
         "last_stage_started": last_stage_started.strftime("%Y-%m-%d"),
-        "last_stage_ended": last_stage_ended.strftime("%Y-%m-%d")
+        "last_stage_ended": last_stage_ended.strftime("%Y-%m-%d"),
+        "ohlcv": ohlcv
     }
