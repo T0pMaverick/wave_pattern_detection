@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import time
 from pandas.tseries.offsets import BDay
+from fastapi.middleware.cors import CORSMiddleware
+
 
 # =========================================================
 # App
@@ -11,6 +13,18 @@ from pandas.tseries.offsets import BDay
 
 app = FastAPI(title="CSE Stage Detection API")
 tv = TvDatafeed()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # =========================================================
 # Indicators
@@ -138,6 +152,7 @@ def safe_get_hist(symbol):
 
 @app.get("/stage/{symbol}")
 def get_stage(symbol: str):
+    print(symbol)
     df = safe_get_hist(symbol)
     if df is None or len(df) < 120:
         raise HTTPException(400, "Insufficient data")
