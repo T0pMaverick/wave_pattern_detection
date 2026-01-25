@@ -1,5 +1,6 @@
 fastapi
 uvicorn
 pandas
+requests
 numpy==1.26.4
 git+https://github.com/rongardF/tvdatafeed.git
