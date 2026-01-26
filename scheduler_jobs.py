@@ -13,6 +13,7 @@ def hourly_pattern_job():
     log_session = LogSession()
 
     try:
+        
         symbol = "OSEA.N0000"
 
         data = fetch_ohlcv(
@@ -22,7 +23,7 @@ def hourly_pattern_job():
         )
 
         pattern = detect_patterns(data)[0]
-
+        
         save_pattern(pattern_session, {
             "company_symbol": symbol,
             "timeframe": "30_min",
@@ -32,14 +33,14 @@ def hourly_pattern_job():
             "price_change": pattern["price_change_pct"],
             "volume_change": pattern["volume_change_pct"]
         })
-
+        
         write_agent_log(
             log_session,
             label="30_MIN_PATTERN_DETECTION",
-            name=None,  # not needed anymore
             description=f"30-min pattern detected for {symbol} | Stage: {pattern['stage']}",
             status="SUCCESS"
         )
+        
 
     except Exception as e:
         write_agent_log(

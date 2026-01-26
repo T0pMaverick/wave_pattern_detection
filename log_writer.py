@@ -19,6 +19,7 @@ def write_agent_log(
     - timestamp
     - agent
     """
+    
 
     query = text("""
         INSERT INTO activity_log
@@ -38,13 +39,15 @@ def write_agent_log(
             :agent
         )
     """)
-
+    
     session.execute(query, {
         "label": label,
-        "name": status,  # SUCCESS / FAILURE
+        "name": status,  
         "description": description,
         "timestamp": datetime.now(),
         "agent": agent
     })
-
+    
     session.commit()
+
+    
