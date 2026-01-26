@@ -7,7 +7,7 @@ STOCK_PRICE_API_URL = "https://cse-maverick-be-platform.onrender.com/api/ohlcv/{
 
 tv = TvDatafeed()
 
-def fetch_ohlcv(intval: str,company_symbol: str, bars: int = 400, max_retries: int = 10):
+def fetch_ohlcv(company_symbol: str, intval: str,bars: int = 400, max_retries: int = 10):
     last_exception = None
     
     for attempt in range(1, max_retries + 1):
