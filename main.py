@@ -2,15 +2,21 @@ from fastapi import FastAPI, HTTPException
 from schemas import PatternRequest
 from services import fetch_ohlcv, fetch_latest_price
 from pattern_engine import detect_patterns
-
+from scheduler import start_scheduler
+from tvDatafeed import Interval
 app = FastAPI(title="CSE Volume Pattern Detection API")
+
+
+@app.on_event("startup")
+async def start_scheduler():
+    start_scheduler()
 
 
 @app.post("/analyze-pattern")
 def analyze_pattern(payload: PatternRequest):
     try:
         print(1)
-        data = fetch_ohlcv(payload.company_symbol)
+        data = fetch_ohlcv(payload.company_symbol,intval=Interval.in_daily)
         patterns = detect_patterns(data)
         print(2)
         latest_pattern = patterns[-1] if patterns else None
