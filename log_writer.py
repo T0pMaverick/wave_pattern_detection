@@ -11,7 +11,7 @@ def write_agent_log(
     metadata: dict = None
 ):
     query = text("""
-        INSERT INTO agent_activity_logs
+        INSERT INTO activity_log
         (
             agent_name,
             agent_type,
