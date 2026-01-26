@@ -1,45 +1,50 @@
 # log_writer.py
 
 from sqlalchemy import text
-import json
+from datetime import datetime
 
 def write_agent_log(
     session,
-    activity: str,
-    status: str,
+    label: str,
     description: str,
-    metadata: dict = None
+    status: str,
+    agent: str = "PatternDetectionAgent"
 ):
+    """
+    Writes logs to the EXISTING activity_log table.
+    Required columns filled:
+    - label
+    - name
+    - description
+    - timestamp
+    - agent
+    """
+
     query = text("""
         INSERT INTO activity_log
         (
-            agent_name,
-            agent_type,
-            activity,
-            status,
+            label,
+            name,
             description,
-            metadata,
-            created_at
+            timestamp,
+            agent
         )
         VALUES
         (
-            :agent_name,
-            :agent_type,
-            :activity,
-            :status,
+            :label,
+            :name,
             :description,
-            :metadata,
-            NOW()
+            :timestamp,
+            :agent
         )
     """)
 
     session.execute(query, {
-        "agent_name": "PatternDetectionAgent",
-        "agent_type": "MARKET_ANALYSIS",
-        "activity": activity,
-        "status": status,
+        "label": label,
+        "name": status,  # SUCCESS / FAILURE
         "description": description,
-        "metadata": json.dumps(metadata or {})
+        "timestamp": datetime.now(),
+        "agent": agent
     })
 
     session.commit()
